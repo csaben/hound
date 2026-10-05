@@ -1,5 +1,9 @@
 # Hound
 
+Hound's goal is super-fast, nearly deterministic, low-cost computer use for QA of your applications.
+Reusable adapters constrain each workflow to known actions and executable criteria, so an agent can
+test real UI behavior with fewer model calls, less variance, and reviewable evidence.
+
 Tell your agent: "Use Hound from https://hound.clarksaben.com to install the CLI, find or adapt the
 right workflow for this computer, run it without taking over my mouse, keyboard, or foreground
 window, and return the recording, captions, criteria results, and run summary."
