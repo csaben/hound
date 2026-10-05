@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hound</title>
+<meta name="description" content="Agent-oriented desktop workflows without interrupting the user.">
+<style>body{font:18px/1.55 system-ui,sans-serif;max-width:760px;margin:8vh auto;padding:0 24px;color:#182018}code,pre{background:#f2f5f0;border-radius:6px}code{padding:.15em .35em}pre{padding:18px;overflow:auto}a{color:#176b3a}</style>
+<h1>Hound</h1>
+<p>Drive, inspect, record, and evaluate desktop applications without taking the user's mouse,
+keyboard focus, foreground window, or visual z-order.</p>
+<pre><code>pipx install --python 3.11 "git+https://github.com/csaben/hound.git"
+hound setup --json
+$env:HOUND_REGISTRY_URL = "https://hound.clarksaben.com/index.json"
+hound adapters search --json</code></pre>
+<p><a href="/llms.txt">Agent instructions</a> · <a href="/quickstart.md">Quickstart</a> ·
+<a href="https://github.com/csaben/hound">Source</a> ·
+<a href="/index.json">Adapter registry</a></p>
+</html>

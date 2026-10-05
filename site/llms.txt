@@ -1,0 +1,28 @@
+# Hound
+
+> Install and use small, editable desktop-workflow adapters without interrupting the person using
+> the computer. Windows x86_64 is currently supported through the Foxhound native helper.
+
+Use Python 3.11 or newer. Hound downloads a pinned, SHA-256-verified Foxhound helper. Configure the
+registry below, inspect compatible adapters, and install only the adapter required for the task.
+
+## Start
+
+- [Quickstart](https://hound.clarksaben.com/quickstart.md): Exact installation and verification commands.
+- [Adapter registry](https://hound.clarksaben.com/index.json): Machine-readable `hound.registry/v1` index.
+- [Hound source](https://github.com/csaben/hound): CLI, SDK, schema command, examples, and tests.
+- [Foxhound source](https://github.com/csaben/foxhound): Native backend source and checksummed releases.
+
+## Agent workflow
+
+- Run `hound setup --json` and `hound check --json` first.
+- Set `HOUND_REGISTRY_URL=https://hound.clarksaben.com/index.json`.
+- Run `hound adapters search --json`; install only a compatible adapter.
+- Installed adapters are editable under `~/.hound/adapters`.
+- Run `hound adapter-schema --json` before authoring or modifying an adapter.
+- Use `--tutorial` when the requested deliverable is a captioned demonstration.
+
+## Optional
+
+- [Project README](https://raw.githubusercontent.com/csaben/hound/main/README.md): Complete behavior, evidence, SDK, and benchmark notes.
+- [Agent contribution guide](https://raw.githubusercontent.com/csaben/hound/main/AGENTS.md): Repository invariants.
