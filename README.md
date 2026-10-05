@@ -22,6 +22,18 @@ Hound deliberately does not contain a general UI agent, publishing service, fixt
 video-production suite. Its contract is: editable adapters, at most one model call per decision,
 executable criteria, and a reviewable run folder.
 
+## Agent operating contract
+
+Use one adapter per application and edit it in place. Do not create separate adapters for tutorial
+steps, owned dialogs, retries, or diagnostics. Foxhound treats an application and its owned dialogs
+as one window group, routes stage-relative clicks to the correct window, and sends keys to the
+topmost enabled input window. Use `hound chain` only when the workflow crosses applications.
+
+If exactly one action is valid, Hound executes it deterministically. `driver_calls: 0` is the ideal
+fast, cheap path and still means Hound ran the workflow; JEV or CLEF is reserved for real choices.
+Keep exploratory artifacts in Hound's run directory, revise the same adapter after inspecting
+evidence, and produce one final tutorial video.
+
 ## Install and check
 
 ```powershell

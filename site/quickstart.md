@@ -18,6 +18,14 @@ For a multi-application tutorial:
 hound chain .\examples\terminal-notepad-chain.yaml --tutorial --json
 ```
 
+Use one adapter per application and edit it in place. Do not create separate adapters for steps,
+dialogs, retries, or diagnostics. Foxhound already treats owned dialogs as part of the application's
+window group. Use a chain only for different applications and produce one final tutorial video.
+
+When only one workflow action is valid, Hound executes it deterministically and does not call JEV
+or CLEF. `driver_calls: 0` is the intended fastest and cheapest path, not a failure to use Hound.
+After two failed exploratory runs, inspect the existing run evidence and revise the same adapter.
+
 `hound setup` downloads a pinned Foxhound release and verifies its SHA-256 digest. Hound does not
 move the physical pointer, inject global keyboard input, activate the target, or allow its windows
 to cover the user's foreground application.

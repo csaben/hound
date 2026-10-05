@@ -103,6 +103,23 @@ def validate(data: dict[str, Any], source: Path | str = "adapter") -> None:
 def schema() -> dict[str, Any]:
     return {
         "schema": "hound.adapter/v1",
+        "authoring_contract": {
+            "unit": "one adapter directory per application; edit it in place",
+            "never_split_for": ["tutorial step", "owned dialog", "retry", "diagnostic run"],
+            "chain_when": "the workflow crosses application boundaries",
+            "window_group": (
+                "Foxhound groups owned dialogs with the target application, routes stage-relative "
+                "clicks to the window under the point, and sends keys to the topmost enabled window"
+            ),
+            "driver_policy": (
+                "one valid action executes deterministically; JEV or CLEF is called only for a real choice"
+            ),
+            "zero_driver_calls": "preferred fastest and cheapest successful path",
+            "exploration_budget": (
+                "after two failed exploratory runs, inspect evidence and revise the same adapter"
+            ),
+            "tutorial_output": "one continuous run or chain and one final video",
+        },
         "required": ["schema", "name", "target", "workflow"],
         "target": {
             "backend": "foxhound",

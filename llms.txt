@@ -6,9 +6,22 @@
 Use adapters for application-specific workflows. Hound selects only adapters compatible with the
 current OS, leaves installed adapters editable, and supports JEV and CLEF System 1 drivers.
 
+## Operating contract
+
+- Use one adapter per application and edit it in place. Never create an adapter per step, modal,
+  retry, or diagnostic attempt.
+- Use a chain only when moving between applications.
+- Foxhound already groups owned dialogs with their application and routes stage-relative input.
+- A one-choice step runs deterministically. Zero JEV/CLEF calls is the ideal cheap path and still
+  means Hound ran the workflow.
+- Keep exploratory output in the Hound run directory. Produce one final tutorial video.
+- After two failed exploratory runs, inspect evidence and revise the same adapter before retrying.
+- Do not change Hound, Foxhound, or the app under test unless requested or a reusable defect is
+  demonstrated by the evidence.
+
 ## Start here
 
-- [Project and CLI guide](README.md): Installation, commands, adapter format, evidence, and measured examples.
+- [Project and CLI guide](README.md): Installation, commands, adapter format, and evidence.
 - [Agent operating guide](AGENTS.md): Minimal workflow and non-interruption invariants.
 - [Example adapter](examples/notepad/adapter.yaml): Small complete Windows adapter.
 - [Example registry](registry/index.json): Static `hound.registry/v1` shape; its repository URL is intentionally non-resolving.

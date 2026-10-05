@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from hound.adapter import load, validate
+from hound.adapter import load, schema, validate
 from hound.errors import AdapterError
 
 
@@ -25,4 +25,11 @@ def test_duplicate_action_ids_rejected():
                 {"id": "same", "op": "key", "keys": "B"},
             ]},
         })
+
+
+def test_schema_exposes_agent_authoring_contract():
+    contract = schema()["authoring_contract"]
+    assert contract["unit"] == "one adapter directory per application; edit it in place"
+    assert "owned dialog" in contract["never_split_for"]
+    assert contract["zero_driver_calls"] == "preferred fastest and cheapest successful path"
 

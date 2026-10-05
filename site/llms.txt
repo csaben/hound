@@ -6,6 +6,20 @@
 Use Python 3.11 or newer. Hound downloads a pinned, SHA-256-verified Foxhound helper. Configure the
 registry below, inspect compatible adapters, and install only the adapter required for the task.
 
+## Operating contract
+
+- Use one adapter per application. Create it once and edit it in place; do not create adapters for
+  individual steps, dialogs, retries, or diagnostic attempts.
+- Use `hound chain` only when the workflow crosses application boundaries.
+- Foxhound treats an app and its owned dialogs as one window group and routes stage-relative input.
+- Hound executes a sole valid action deterministically. Zero JEV/CLEF calls is the preferred fast,
+  cheap path and still means the System 1 harness performed the workflow.
+- Keep experiments inside Hound run directories and emit one final tutorial video.
+- After two failed exploratory runs, inspect screenshots, traces, and window data, then revise the
+  same adapter instead of generating another one.
+- Do not edit Hound, Foxhound, or the application under test unless explicitly requested or the
+  evidence demonstrates a reusable infrastructure defect.
+
 ## Start
 
 - [Quickstart](https://hound.clarksaben.com/quickstart.md): Exact installation and verification commands.
@@ -25,5 +39,5 @@ registry below, inspect compatible adapters, and install only the adapter requir
 
 ## Optional
 
-- [Project README](https://raw.githubusercontent.com/csaben/hound/main/README.md): Complete behavior, evidence, SDK, and benchmark notes.
+- [Project README](https://raw.githubusercontent.com/csaben/hound/main/README.md): Complete behavior, evidence, and SDK.
 - [Agent contribution guide](https://raw.githubusercontent.com/csaben/hound/main/AGENTS.md): Repository invariants.
