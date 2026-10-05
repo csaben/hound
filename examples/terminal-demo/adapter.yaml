@@ -1,0 +1,45 @@
+schema: hound.adapter/v1
+name: terminal-demo
+description: Show the Hound chain command in a dedicated terminal window.
+
+platforms:
+  windows:
+    backend: foxhound
+
+target:
+  backend: foxhound
+  process: cmd.exe
+  title: Hound Demo
+  new_console: true
+  launch:
+    - cmd.exe
+    - /d
+    - /k
+    - "title Hound Demo && echo PS^> hound chain examples\\terminal-notepad-chain.yaml --tutorial"
+  launch_wait_s: 0.5
+
+driver:
+  default: jev
+  allowed: [jev, clef]
+  image_policy: never
+
+workflow:
+  goal: Show the command that starts a multi-application Hound tutorial.
+  actions:
+    - id: show_command
+      op: wait
+      seconds: 2
+      description: Hold the terminal long enough to read the Hound command.
+      caption: Start the Hound chain from the terminal
+      terminal: true
+  done:
+    after_action: show_command
+  criteria:
+    - id: terminal_alive
+      expect: The terminal remains visible for the introduction.
+      check: builtin.target_alive
+
+recording:
+  enabled: true
+  captions: actions
+  fps: 8

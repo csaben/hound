@@ -2,12 +2,17 @@
 
 Hound is a small, agent-oriented CLI and Python library for driving, inspecting, and recording an
 application without taking the human's mouse, keyboard, cursor, or foreground window. On Windows it
-uses [Foxhound](../foxhound/README.md) for covered-window capture and background input. A SystemOne
-decision model—JEV or CLEF—chooses one adapter-defined action per step.
+uses [Foxhound](https://github.com/csaben/foxhound) for covered-window capture and background input.
+A SystemOne decision model (JEV or CLEF) chooses one adapter-defined action per step.
+
+[Watch the terminal-to-Notepad chain demo](public/hound-terminal-notepad-demo.mp4). It starts with the
+actual `hound chain` command, cuts to Notepad, types the note in the background, burns action
+captions, and produces one 1280x720 H.264 tutorial. The validated run used no model calls because
+every stage had one unambiguous next action.
 
 Hound deliberately does not contain a general UI agent, publishing service, fixture laboratory, or
-video-production suite. Its contract is: editable adapters, one model call per action, executable
-criteria, and a reviewable run folder.
+video-production suite. Its contract is: editable adapters, at most one model call per decision,
+executable criteria, and a reviewable run folder.
 
 ## Install and check
 
@@ -49,6 +54,7 @@ Core discovery commands:
 hound check
 hound setup
 hound adapter-schema
+hound chain CHAIN.yaml
 hound adapters list
 hound adapters search [QUERY]
 hound adapters add NAME
@@ -91,6 +97,7 @@ workflow:
       description: Select the document editor.
       caption: Select the editor
     - id: type_text
+      after: select_editor
       op: type
       text: "{{ text }}"
       description: Type the requested text.
@@ -127,7 +134,7 @@ Each run writes:
 
 The recorder continuously captures the Foxhound-owned window. Action events and captions share the
 same run-relative clock. Hound records the physical cursor and foreground window around each action
-for auditability, but does not treat human activity as a failure—the user is expected to keep using
+for auditability, but does not treat human activity as a failure. The user is expected to keep using
 the computer. Non-interruption is enforced structurally: Hound exposes only Foxhound's posted input
 API and never calls physical mouse, keyboard, or foreground-window APIs.
 
@@ -160,6 +167,36 @@ print(result.success, result.run_dir)
 ```
 
 The CLI calls this API; there is no separate CLI orchestration implementation.
+
+## Multi-application chains
+
+`hound chain` runs ordered adapter stages while keeping each app's workflow, criteria, and evidence
+separate. It then normalizes the captioned stage clips to one canvas and joins them with focus cuts.
+Only the current adapter's actions are considered, so adding applications does not inflate every
+driver prompt.
+
+```powershell
+hound chain .\examples\terminal-notepad-chain.yaml --tutorial --json
+```
+
+```yaml
+schema: hound.chain/v1
+name: terminal-to-notepad
+stages:
+  - id: terminal
+    adapter: terminal-demo
+  - id: notepad
+    adapter: notepad
+    variables:
+      text: "Hound can move between applications."
+recording:
+  layout: focus
+```
+
+The chain run contains `chain.json`, a `stages/` directory with each adapter's complete evidence,
+and `tutorial.mp4`. A failed stage stops the chain unless it declares `continue_on_failure: true`.
+Actions are executed directly when exactly one choice is valid; JEV or CLEF is called only when a
+real decision is required.
 
 ## Benchmarks
 

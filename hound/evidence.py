@@ -115,3 +115,30 @@ def burn_captions(video: Path, captions: Path, output: Path) -> Path | None:
         capture_output=True, text=True,
     )
     return output if result.returncode == 0 else None
+
+
+def compose_focus_videos(videos: list[Path], output: Path, width: int = 1280, height: int = 720) -> Path | None:
+    """Normalize stage clips to one canvas and join them with hard cuts."""
+    ffmpeg = shutil.which("ffmpeg")
+    videos = [Path(video) for video in videos if Path(video).exists()]
+    if not ffmpeg or not videos:
+        return None
+    inputs: list[str] = []
+    filters: list[str] = []
+    labels: list[str] = []
+    for index, video in enumerate(videos):
+        inputs += ["-i", str(video)]
+        label = f"v{index}"
+        labels.append(f"[{label}]")
+        filters.append(
+            f"[{index}:v]scale={width}:{height}:force_original_aspect_ratio=decrease,"
+            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,fps=30[{label}]"
+        )
+    filters.append(f"{''.join(labels)}concat=n={len(labels)}:v=1:a=0[outv]")
+    result = subprocess.run(
+        [ffmpeg, "-hide_banner", "-loglevel", "error", "-y", *inputs,
+         "-filter_complex", ";".join(filters), "-map", "[outv]",
+         "-c:v", "libx264", "-pix_fmt", "yuv420p", str(output)],
+        capture_output=True, text=True,
+    )
+    return output if result.returncode == 0 else None

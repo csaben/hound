@@ -20,6 +20,7 @@ registry below, inspect compatible adapters, and install only the adapter requir
 - Run `hound adapters search --json`; install only a compatible adapter.
 - Installed adapters are editable under `~/.hound/adapters`.
 - Run `hound adapter-schema --json` before authoring or modifying an adapter.
+- Use `hound chain CHAIN.yaml --tutorial --json` for ordered multi-application workflows.
 - Use `--tutorial` when the requested deliverable is a captioned demonstration.
 
 ## Optional

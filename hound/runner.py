@@ -11,7 +11,7 @@ from typing import Any
 
 from .adapter import Adapter, load
 from .backend import FoxhoundBackend, HumanState, human_state
-from .drivers import create
+from .drivers import Decision, create
 from .errors import HoundError
 from .evidence import Recorder, Trace, burn_captions, write_captions
 from .util import user_root
@@ -122,6 +122,7 @@ class Hound:
         backend_start_s = 0.0
         reason = "step limit"
         success = False
+        driver = None
         try:
             prepare = getattr(adapter.hooks, "prepare", None) if adapter.hooks else None
             if callable(prepare):
@@ -131,6 +132,7 @@ class Hound:
             context = RunContext(adapter, backend, run_dir, options.variables)
             if options.record:
                 recorder = Recorder(run_dir, backend.screenshot, options.fps)
+                trace.started = time.time()
                 recorder.start()
             start_hook = adapter.workflow.get("start", {}).get("hook")
             if start_hook:
@@ -174,16 +176,21 @@ class Hound:
                 if not available:
                     raise HoundError("adapter has no available actions in the current workflow state")
                 use_image = self.driver_name == "clef" and adapter.data.get("driver", {}).get("image_policy", "always") != "never"
-                decision = driver.choose(state, available, frame if use_image else None)
+                if len(available) == 1:
+                    decision = Decision(available[0]["id"], 1.0, {"mode": "deterministic"}, 0.0)
+                else:
+                    decision = driver.choose(state, available, frame if use_image else None)
                 usage = decision.raw.get("usage") or {}
-                driver_calls += 1
-                driver_ms += decision.elapsed_ms
-                input_tokens += int(usage.get("input_tokens") or 0)
-                output_tokens += int(usage.get("output_tokens") or 0)
+                if decision.raw.get("mode") != "deterministic":
+                    driver_calls += 1
+                    driver_ms += decision.elapsed_ms
+                    input_tokens += int(usage.get("input_tokens") or 0)
+                    output_tokens += int(usage.get("output_tokens") or 0)
                 action = next((a for a in available if a["id"] == decision.action_id), None)
                 if action is None:
                     raise HoundError(f"driver chose unavailable action {decision.action_id!r}")
                 before_human = human_state()
+                action_started = time.time()
                 if action["op"] == "hook":
                     adapter.call(action["hook"], context, action)
                     effect: Any = {"ok": True}
@@ -195,6 +202,7 @@ class Hound:
                 after_human = human_state()
                 actions_taken.append(action["id"])
                 event = trace.emit("action", step=step + 1, action_id=action["id"],
+                                   t_video=round(action_started - trace.started, 3),
                                    caption=action.get("caption") or action.get("description") or action["id"],
                                    confidence=decision.confidence, driver_ms=decision.elapsed_ms, effect=effect,
                                    usage=usage or None,
@@ -228,7 +236,7 @@ class Hound:
             write_captions(captions, action_events, duration)
             if recording:
                 captioned = burn_captions(recording, captions, run_dir / "captioned.mp4")
-        driver_model = getattr(driver, "model", None)
+        driver_model = getattr(driver, "model", None) if driver_calls else None
         if self.driver_name == "jev":
             price_per_million = float(os.environ.get("HOUND_JEV_INPUT_USD_PER_M", "0.042"))
         elif self.driver_name == "clef":

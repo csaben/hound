@@ -12,6 +12,9 @@ behavior is specific to one application.
 5. Edit the installed adapter under `~/.hound/adapters` when workflow-specific knowledge is needed.
 6. Run with `--tutorial` when the requested output is a narrated/captioned demonstration.
 
+Use a `hound.chain/v1` manifest and `hound chain` when a workflow crosses application boundaries.
+Keep application order explicit and keep each application's behavior in its own adapter.
+
 ## Invariants
 
 - Do not use physical mouse or keyboard injection or steal the foreground window.

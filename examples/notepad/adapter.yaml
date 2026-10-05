@@ -30,13 +30,20 @@ workflow:
       description: Select the central document editor so it accepts text.
       caption: Select the editor
     - id: type_requested_text
+      after: select_editor
       op: type
       text: "{{ text }}"
       description: Type the requested text into the selected editor.
       caption: Type the requested text
+    - id: review_result
+      after: type_requested_text
+      op: wait
+      seconds: 2
+      description: Hold the completed note long enough to review it.
+      caption: Review the completed note
       terminal: true
   done:
-    after_action: type_requested_text
+    after_action: review_result
   criteria:
     - id: target_alive
       expect: Notepad remains running after the text is entered.
@@ -53,4 +60,3 @@ recording:
 tutorial:
   title: Type into Notepad without interrupting the user
   include: [successful_actions, final_result]
-

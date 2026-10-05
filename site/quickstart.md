@@ -12,6 +12,12 @@ hound adapters add notepad
 hound run notepad "Write a short note" --var text="hello" --tutorial --json
 ```
 
+For a multi-application tutorial:
+
+```powershell
+hound chain .\examples\terminal-notepad-chain.yaml --tutorial --json
+```
+
 `hound setup` downloads a pinned Foxhound release and verifies its SHA-256 digest. Hound does not
 move the physical pointer, inject global keyboard input, activate the target, or allow its windows
 to cover the user's foreground application.

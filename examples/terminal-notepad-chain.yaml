@@ -1,0 +1,20 @@
+schema: hound.chain/v1
+name: terminal-to-notepad
+goal: Demonstrate starting Hound and driving Notepad without interrupting the user.
+
+stages:
+  - id: terminal
+    adapter: terminal-demo
+    goal: Show the command that starts this tutorial.
+
+  - id: notepad
+    adapter: notepad
+    goal: Write a short explanation of Hound in Notepad.
+    variables:
+      text: "Hound drives desktop apps without interrupting you.\r\nYour mouse, keyboard focus, and foreground window stay yours."
+
+recording:
+  layout: focus
+  captions: true
+
+tutorial: true

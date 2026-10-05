@@ -89,7 +89,7 @@ class FoxhoundBackend:
             command = launch if isinstance(launch, list) else [launch]
             image = str(self.target.get("process") or Path(command[0]).name)
             before_pids = self._process_pids(image)
-            creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+            creationflags = 0
             startupinfo = None
             if os.name == "nt":
                 # Prevent a newly launched app from taking the human's foreground. Foxhound will
@@ -98,7 +98,10 @@ class FoxhoundBackend:
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                 startupinfo.wShowWindow = 7  # SW_SHOWMINNOACTIVE
-                creationflags |= getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+                if self.target.get("new_console"):
+                    creationflags |= getattr(subprocess, "CREATE_NEW_CONSOLE", 0)
+                else:
+                    creationflags |= getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
             self.owned_app = subprocess.Popen(
                 command, cwd=self.target.get("cwd"), creationflags=creationflags,
                 startupinfo=startupinfo,
@@ -112,7 +115,7 @@ class FoxhoundBackend:
             self.owned_pids = self._process_pids(image) - before_pids
             # Prefer the uniquely created real process. This handles packaged applications whose
             # launcher immediately hands off to another PID without ever owning a window.
-            if len(self.owned_pids) == 1:
+            if len(self.owned_pids) == 1 and not any(self.target.get(key) for key in ("title", "hwnd")):
                 self.target = {**self.target, "pid": next(iter(self.owned_pids))}
         if self.external_helper:
             self._request("GET", "/health")

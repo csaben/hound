@@ -30,12 +30,7 @@ class FakeBackend:
 
 class FakeDriver:
     def choose(self, state, actions, image=None):
-        class Choice:
-            action_id = "finish"
-            confidence = 1.0
-            elapsed_ms = 0.1
-            raw = {"usage": {"input_tokens": 10, "output_tokens": 1}}
-        return Choice()
+        raise AssertionError("a single available action should not call the model")
 
 
 def test_complete_run_writes_contract(tmp_path: Path, monkeypatch):
@@ -59,6 +54,7 @@ workflow:
     result = Hound(adapter).run(options=RunOptions(record=False, captions=True, output=output))
     assert result.success
     assert result.steps == 1
+    assert result.metrics["driver_calls"] == 0
     assert (output / "run.json").exists()
     assert (output / "trace.jsonl").exists()
     assert (output / "captions.vtt").exists()

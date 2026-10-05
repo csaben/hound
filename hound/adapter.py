@@ -107,7 +107,7 @@ def schema() -> dict[str, Any]:
         "target": {
             "backend": "foxhound",
             "one_of": ["process", "pid", "title", "hwnd"],
-            "optional": ["launch", "cwd", "launch_wait_s", "backend_timeout_s", "helper_url", "helper_path"],
+            "optional": ["launch", "cwd", "launch_wait_s", "backend_timeout_s", "helper_url", "helper_path", "new_console"],
         },
         "workflow": {
             "required": ["goal", "actions"],

@@ -10,6 +10,7 @@ from pathlib import Path
 
 from . import __version__
 from .adapter import describe, load, schema
+from .chain import ChainRunner
 from .errors import HoundError
 from .foxhound import ensure_helper, find_helper
 from .registry import install, installed, search
@@ -25,6 +26,16 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("check", help="check this machine")
     commands.add_parser("setup", help="download and verify the native Foxhound helper")
     commands.add_parser("adapter-schema", help="print the adapter contract")
+    chain = commands.add_parser("chain", help="run an ordered multi-application workflow")
+    chain.add_argument("manifest")
+    chain.add_argument("--driver", choices=("jev", "clef"))
+    chain.add_argument("--tutorial", action="store_true")
+    chain.add_argument("--no-record", action="store_true")
+    chain.add_argument("--no-captions", action="store_true")
+    chain.add_argument("--max-steps", type=int, default=20)
+    chain.add_argument("--timeout", type=float, default=180)
+    chain.add_argument("--output", type=Path)
+    chain.add_argument("--var", action="append", default=[], metavar="KEY=VALUE")
 
     adapters = commands.add_parser("adapters", help="discover and manage adapters")
     sub = adapters.add_subparsers(dest="adapters_command", required=True)
@@ -90,6 +101,17 @@ def main(argv: list[str] | None = None) -> int:
             result = {"ok": True, "foxhound_helper": ensure_helper()}
         elif args.command == "adapter-schema":
             result = schema()
+        elif args.command == "chain":
+            options = RunOptions(
+                record=not args.no_record,
+                captions=not args.no_captions,
+                tutorial=args.tutorial,
+                max_steps=args.max_steps,
+                timeout_s=args.timeout,
+                output=args.output,
+                variables=_variables(args.var),
+            )
+            result = ChainRunner(args.manifest, args.driver).run(options).as_dict()
         elif args.command == "adapters":
             if args.adapters_command == "list":
                 result = installed()
