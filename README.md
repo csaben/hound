@@ -5,10 +5,12 @@ application without taking the human's mouse, keyboard, cursor, or foreground wi
 uses [Foxhound](https://github.com/csaben/foxhound) for covered-window capture and background input.
 A SystemOne decision model (JEV or CLEF) chooses one adapter-defined action per step.
 
-[Watch the terminal-to-Notepad chain demo](public/hound-terminal-notepad-demo.mp4). It starts with the
-actual `hound chain` command, cuts to Notepad, types the note in the background, burns action
-captions, and produces one 1280x720 H.264 tutorial. The validated run used no model calls because
-every stage had one unambiguous next action.
+[![Hound terminal-to-Notepad chain demo](public/hound-terminal-notepad-demo.gif)](public/hound-terminal-notepad-demo.mp4)
+
+The embedded demo starts with the actual `hound chain` command, cuts to Notepad, types the note in
+the background, burns action captions, and produces one 1280x720 H.264 tutorial. Click the GIF for
+the full-resolution MP4. The validated run used no model calls because every stage had one
+unambiguous next action.
 
 Hound deliberately does not contain a general UI agent, publishing service, fixture laboratory, or
 video-production suite. Its contract is: editable adapters, at most one model call per decision,
