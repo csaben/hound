@@ -1,0 +1,26 @@
+# Hound
+
+> A small agent-oriented CLI and Python SDK for driving, inspecting, recording, and evaluating
+> desktop applications without interrupting the person using the computer.
+
+Use adapters for application-specific workflows. Hound selects only adapters compatible with the
+current OS, leaves installed adapters editable, and supports JEV and CLEF System 1 drivers.
+
+## Start here
+
+- [Project and CLI guide](README.md): Installation, commands, adapter format, evidence, and measured examples.
+- [Agent operating guide](AGENTS.md): Minimal workflow and non-interruption invariants.
+- [Example adapter](examples/notepad/adapter.yaml): Small complete Windows adapter.
+- [Example registry](registry/index.json): Static `hound.registry/v1` shape; its repository URL is intentionally non-resolving.
+
+## Machine-readable discovery
+
+- Run `hound setup --json` to download and verify the pinned native helper.
+- Run `hound check --json` to inspect local capabilities.
+- Run `hound adapter-schema --json` for the adapter contract.
+- Set `HOUND_REGISTRY_URL` or pass `--registry` before remote adapter discovery.
+
+## Source
+
+- [Public repository](https://github.com/csaben/hound): Canonical source.
+- [Foxhound](https://github.com/csaben/foxhound): Native Windows backend and helper releases.

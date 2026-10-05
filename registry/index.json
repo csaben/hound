@@ -1,0 +1,23 @@
+{
+  "schema": "hound.registry/v1",
+  "adapters": [
+    {
+      "name": "notepad",
+      "description": "Type and save text with Windows Notepad without foreground input",
+      "repository": "https://example.invalid/hound-adapters.git",
+      "revision": "main",
+      "path": "examples/notepad",
+      "platforms": {
+        "windows": {
+          "architectures": ["x86_64", "arm64"]
+        }
+      },
+      "requires": {
+        "hound": ">=0.1,<0.2",
+        "backend": "foxhound",
+        "backend_version": ">=0.1"
+      },
+      "capabilities": ["background-input", "window-capture", "recording", "tutorial"]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+schema: hound.adapter/v1
+name: notepad-example
+description: Minimal local Notepad example; coordinates assume a normally sized new Notepad window.
+
+platforms:
+  windows:
+    backend: foxhound
+
+target:
+  backend: foxhound
+  process: notepad.exe
+  launch: [notepad.exe]
+  launch_wait_s: 1
+
+driver:
+  default: jev
+  allowed: [jev, clef]
+  image_policy: always
+
+workflow:
+  goal: Type the requested text into a new Notepad document.
+  guidance:
+    - The large central area is the document editor.
+    - Select the editor before typing.
+  actions:
+    - id: select_editor
+      op: click
+      x: 400
+      y: 300
+      description: Select the central document editor so it accepts text.
+      caption: Select the editor
+    - id: type_requested_text
+      op: type
+      text: "{{ text }}"
+      description: Type the requested text into the selected editor.
+      caption: Type the requested text
+      terminal: true
+  done:
+    after_action: type_requested_text
+  criteria:
+    - id: target_alive
+      expect: Notepad remains running after the text is entered.
+      check: builtin.target_alive
+  source_refs:
+    - path: ../foxhound/crates/foxhound-input/src/keys.rs
+      purpose: Background Unicode input implementation
+
+recording:
+  enabled: true
+  captions: actions
+  fps: 8
+
+tutorial:
+  title: Type into Notepad without interrupting the user
+  include: [successful_actions, final_result]
+
