@@ -12,10 +12,13 @@ criteria, and a reviewable run folder.
 ## Install and check
 
 ```powershell
-pipx install "hound-agent[jev] @ git+https://github.com/csaben/hound.git"
+pipx install --python 3.11 "git+https://github.com/csaben/hound.git"
 hound setup --json
 hound check --json
 ```
+
+Hound requires Python 3.11 or newer. Add the optional JEV driver with
+`pipx inject hound-agent "typesafe-sdk>=0.7.2"`; CLEF uses the core installation.
 
 `hound setup` downloads the pinned Windows x86_64 helper from the public Foxhound release, verifies
 its SHA-256 digest, and caches it under `HOUND_HOME`. The first run also performs this bootstrap when
