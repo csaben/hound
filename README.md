@@ -1,5 +1,9 @@
 # Hound
 
+Tell your agent: "Use Hound from https://hound.clarksaben.com to install the CLI, find or adapt the
+right workflow for this computer, run it without taking over my mouse, keyboard, or foreground
+window, and return the recording, captions, criteria results, and run summary."
+
 Hound is a small, agent-oriented CLI and Python library for driving, inspecting, and recording an
 application without taking the human's mouse, keyboard, cursor, or foreground window. On Windows it
 uses [Foxhound](https://github.com/csaben/foxhound) for covered-window capture and background input.
