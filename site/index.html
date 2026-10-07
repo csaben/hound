@@ -8,7 +8,8 @@
 <h1>Hound</h1>
 <p>Drive, inspect, record, and evaluate desktop applications without taking the user's mouse,
 keyboard focus, foreground window, or visual z-order.</p>
-<pre><code>pipx install --python 3.11 "git+https://github.com/csaben/hound.git"
+<pre><code>uv tool install "hound-agent @ git+https://github.com/csaben/hound.git"
+hound codex install
 hound setup --json
 $env:HOUND_REGISTRY_URL = "https://hound.clarksaben.com/index.json"
 hound adapters search --json</code></pre>

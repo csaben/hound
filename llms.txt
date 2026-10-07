@@ -28,6 +28,9 @@ current OS, leaves installed adapters editable, and supports JEV and CLEF System
 
 ## Machine-readable discovery
 
+- Install globally with `uv tool install "hound-agent @ git+https://github.com/csaben/hound.git"`.
+- Run `hound codex install` to add the optional global Codex skill.
+- Run `hound codex remove` to remove that managed skill without touching other skills.
 - Run `hound setup --json` to download and verify the pinned native helper.
 - Run `hound check --json` to inspect local capabilities.
 - Run `hound adapter-schema --json` for the adapter contract.

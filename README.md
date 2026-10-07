@@ -37,13 +37,30 @@ evidence, and produce one final tutorial video.
 ## Install and check
 
 ```powershell
-pipx install --python 3.11 "git+https://github.com/csaben/hound.git"
+uv tool install "hound-agent @ git+https://github.com/csaben/hound.git"
 hound setup --json
 hound check --json
 ```
 
 Hound requires Python 3.11 or newer. Add the optional JEV driver with
-`pipx inject hound-agent "typesafe-sdk>=0.7.2"`; CLEF uses the core installation.
+`uv tool install --force --with "typesafe-sdk>=0.7.2" "hound-agent @ git+https://github.com/csaben/hound.git"`;
+CLEF uses the core installation.
+
+Make Codex discover and prefer Hound for native application QA:
+
+```powershell
+hound codex install                 # global skill under ~/.agents/skills/hound
+hound codex install --agents        # also add a marked block to ./AGENTS.md
+hound codex status --agents
+```
+
+The integration is deliberately disposable. Hound refuses to overwrite or remove an unowned skill
+directory, and it edits only its marked block in `AGENTS.md`:
+
+```powershell
+hound codex remove --agents
+uv tool uninstall hound-agent
+```
 
 `hound setup` downloads the pinned Windows x86_64 helper from the public Foxhound release, verifies
 its SHA-256 digest, and caches it under `HOUND_HOME`. The first run also performs this bootstrap when
@@ -74,6 +91,7 @@ Core discovery commands:
 hound check
 hound setup
 hound adapter-schema
+hound codex {install,status,remove}
 hound chain CHAIN.yaml
 hound adapters list
 hound adapters search [QUERY]

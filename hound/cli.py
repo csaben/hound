@@ -11,6 +11,9 @@ from pathlib import Path
 from . import __version__
 from .adapter import describe, load, schema
 from .chain import ChainRunner
+from .codex import install as install_codex
+from .codex import remove as remove_codex
+from .codex import status as codex_status
 from .errors import HoundError
 from .foxhound import ensure_helper, find_helper
 from .registry import install, installed, search
@@ -26,6 +29,19 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("check", help="check this machine")
     commands.add_parser("setup", help="download and verify the native Foxhound helper")
     commands.add_parser("adapter-schema", help="print the adapter contract")
+    codex = commands.add_parser("codex", help="manage the optional global Codex skill")
+    codex_sub = codex.add_subparsers(dest="codex_command", required=True)
+    for name, help_text in (
+        ("install", "install or update Hound's Codex skill"),
+        ("status", "show Hound's managed Codex integration"),
+        ("remove", "remove Hound's managed Codex integration"),
+    ):
+        command = codex_sub.add_parser(name, help=help_text)
+        command.add_argument("--skills-dir", type=Path)
+        command.add_argument(
+            "--agents", nargs="?", const=Path("AGENTS.md"), type=Path, metavar="PATH",
+            help="also manage Hound's marked block in PATH (default: ./AGENTS.md)",
+        )
     chain = commands.add_parser("chain", help="run an ordered multi-application workflow")
     chain.add_argument("manifest")
     chain.add_argument("--driver", choices=("jev", "clef"))
@@ -101,6 +117,13 @@ def main(argv: list[str] | None = None) -> int:
             result = {"ok": True, "foxhound_helper": ensure_helper()}
         elif args.command == "adapter-schema":
             result = schema()
+        elif args.command == "codex":
+            if args.codex_command == "install":
+                result = install_codex(args.skills_dir, args.agents)
+            elif args.codex_command == "remove":
+                result = remove_codex(args.skills_dir, args.agents)
+            else:
+                result = codex_status(args.skills_dir, args.agents)
         elif args.command == "chain":
             options = RunOptions(
                 record=not args.no_record,

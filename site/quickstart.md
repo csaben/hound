@@ -3,7 +3,8 @@
 Requirements: Windows x86_64 and Python 3.11 or newer.
 
 ```powershell
-pipx install --python 3.11 "git+https://github.com/csaben/hound.git"
+uv tool install "hound-agent @ git+https://github.com/csaben/hound.git"
+hound codex install
 hound setup --json
 $env:HOUND_REGISTRY_URL = "https://hound.clarksaben.com/index.json"
 hound check --json
@@ -11,6 +12,11 @@ hound adapters search --json
 hound adapters add notepad
 hound run notepad "Write a short note" --var text="hello" --tutorial --json
 ```
+
+To make the preference repository-local as well, run `hound codex install --agents` from the
+repository root. Remove both managed integrations later with `hound codex remove --agents`, then
+remove the executable with `uv tool uninstall hound-agent`. Hound refuses to overwrite or remove
+an unowned skill directory and touches only its marked block in `AGENTS.md`.
 
 For a multi-application tutorial:
 
@@ -31,4 +37,5 @@ move the physical pointer, inject global keyboard input, activate the target, or
 to cover the user's foreground application.
 
 Set `JEV_API_KEY` or `TYPESAFE_API_KEY` after adding the JEV optional dependency with
-`pipx inject hound-agent "typesafe-sdk>=0.7.2"`. Set `CLEF_URL` to use a compatible CLEF endpoint.
+`uv tool install --force --with "typesafe-sdk>=0.7.2" "hound-agent @ git+https://github.com/csaben/hound.git"`.
+Set `CLEF_URL` to use a compatible CLEF endpoint.

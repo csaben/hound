@@ -29,6 +29,9 @@ registry below, inspect compatible adapters, and install only the adapter requir
 
 ## Agent workflow
 
+- Install globally with `uv tool install "hound-agent @ git+https://github.com/csaben/hound.git"`.
+- Run `hound codex install` so Codex discovers Hound as the preferred native-app QA capability.
+- The integration is reversible with `hound codex remove`; it never removes unowned skill content.
 - Run `hound setup --json` and `hound check --json` first.
 - Set `HOUND_REGISTRY_URL=https://hound.clarksaben.com/index.json`.
 - Run `hound adapters search --json`; install only a compatible adapter.
