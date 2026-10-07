@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import importlib.util
 import io
 import json
 import os
@@ -12,6 +13,45 @@ import requests
 from PIL import Image
 
 from .errors import DriverError
+
+
+def status() -> dict[str, Any]:
+    jev_key = bool(os.environ.get("TYPESAFE_API_KEY") or os.environ.get("JEV_API_KEY"))
+    jev_sdk = importlib.util.find_spec("typesafe_sdk") is not None
+    clef_url = os.environ.get("CLEF_URL")
+    jev_env = '$env:JEV_API_KEY = "<your key>"' if os.name == "nt" else 'export JEV_API_KEY="<your key>"'
+    clef_env = (
+        '$env:CLEF_URL = "http://127.0.0.1:8787/v1/systemone"'
+        if os.name == "nt" else 'export CLEF_URL="http://127.0.0.1:8787/v1/systemone"'
+    )
+    return {
+        "jev": {
+            "ready": jev_key and jev_sdk,
+            "key_configured": jev_key,
+            "sdk_installed": jev_sdk,
+            "model": os.environ.get("JEV_MODEL", "jev-latest"),
+            "setup": [
+                'uv tool install --force --with "typesafe-sdk>=0.7.2" '
+                '"hound-agent @ git+https://github.com/csaben/hound.git"',
+                jev_env,
+                "Set the real value locally; do not paste it into chat.",
+            ],
+        },
+        "clef": {
+            "ready": bool(clef_url),
+            "url_configured": bool(clef_url),
+            "url": clef_url,
+            "model": os.environ.get("CLEF_MODEL", "clef"),
+            "setup": [
+                clef_env,
+                "Replace the example with your SystemOne-compatible endpoint when needed.",
+            ],
+        },
+        "note": (
+            "Drivers are needed only when two or more workflow actions are valid; "
+            "deterministic one-action steps require no credentials."
+        ),
+    }
 
 
 @dataclass
@@ -51,10 +91,18 @@ class JevDriver:
         self.model = model or os.environ.get("JEV_MODEL", "jev-latest")
 
     def choose(self, state: dict[str, Any], actions: list[dict[str, Any]], image: bytes | None = None) -> Decision:
+        if not (os.environ.get("TYPESAFE_API_KEY") or os.environ.get("JEV_API_KEY")):
+            raise DriverError(
+                "JEV is not configured; set JEV_API_KEY or TYPESAFE_API_KEY in your local "
+                "environment (do not paste the secret into chat), then run `hound check --json`"
+            )
         try:
             from typesafe_sdk import TypeSafeClient
         except ImportError as exc:
-            raise DriverError("JEV requires `pip install hound-agent[jev]`") from exc
+            raise DriverError(
+                "JEV support is not installed; run `uv tool install --force --with "
+                '\"typesafe-sdk>=0.7.2\" \"hound-agent @ git+https://github.com/csaben/hound.git\"`'
+            ) from exc
         if "TYPESAFE_API_KEY" not in os.environ and os.environ.get("JEV_API_KEY"):
             os.environ["TYPESAFE_API_KEY"] = os.environ["JEV_API_KEY"]
         started = time.perf_counter()
@@ -88,7 +136,8 @@ class ClefDriver:
                 detail = response.text[:300].replace("\n", " ")
                 raise DriverError(f"CLEF request failed: HTTP {response.status_code}: {detail}")
         except requests.RequestException as exc:
-            raise DriverError(f"CLEF request failed: {exc}") from exc
+            hint = " Set CLEF_URL to a reachable SystemOne endpoint and run `hound check --json`."
+            raise DriverError(f"CLEF request failed at {self.url}: {exc}.{hint}") from exc
         raw = response.json()
         if isinstance(raw.get("result"), dict):
             raw = raw["result"]

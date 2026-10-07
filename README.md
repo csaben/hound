@@ -42,6 +42,10 @@ hound setup --json
 hound check --json
 ```
 
+`hound check --json` reports separate JEV and CLEF readiness plus exact setup instructions. A fresh
+base install has no cloud credentials. Deterministic steps still run because Hound calls a driver
+only when two or more actions are valid.
+
 Hound requires Python 3.11 or newer. Add the optional JEV driver with
 `uv tool install --force --with "typesafe-sdk>=0.7.2" "hound-agent @ git+https://github.com/csaben/hound.git"`;
 CLEF uses the core installation.
@@ -68,7 +72,8 @@ the helper is missing. Set `FOXHOUND_HELPER` to use a local binary, or set both
 `HOUND_FOXHOUND_URL` and `HOUND_FOXHOUND_SHA256` to use another trusted build.
 
 Set `JEV_API_KEY`/`TYPESAFE_API_KEY` for JEV, or `CLEF_URL` for a SystemOne-compatible CLEF
-endpoint. `FOXHOUND_HELPER` can point at a helper binary outside the adjacent Foxhound checkout.
+endpoint. Set secrets in the local environment, never in a prompt or adapter. `FOXHOUND_HELPER` can
+point at a helper binary outside the adjacent Foxhound checkout.
 
 ## Agent happy path
 

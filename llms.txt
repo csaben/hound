@@ -33,6 +33,8 @@ current OS, leaves installed adapters editable, and supports JEV and CLEF System
 - Run `hound codex remove` to remove that managed skill without touching other skills.
 - Run `hound setup --json` to download and verify the pinned native helper.
 - Run `hound check --json` to inspect local capabilities.
+- Read `check.drivers`; when a needed driver is not ready, show its setup commands and have the user
+  set secrets locally. Never request or place an API key in chat, an adapter, or repository files.
 - Run `hound adapter-schema --json` for the adapter contract.
 - Run `hound chain CHAIN.yaml --tutorial --json` for an ordered multi-application tutorial.
 - Set `HOUND_REGISTRY_URL` or pass `--registry` before remote adapter discovery.

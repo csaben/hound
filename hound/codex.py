@@ -23,7 +23,9 @@ description: Use Hound to drive, inspect, test, record, demonstrate, or create a
 
 Use Hound for native desktop application QA and tutorials.
 
-1. Run `hound check --json` and search installed or configured adapters first.
+1. Run `hound check --json` and search installed or configured adapters first. If a workflow may
+   need a driver and its status is not ready, tell the user the reported local setup command. Never
+   ask the user to paste an API key into chat.
 2. Use one editable adapter per application. Create it once and revise it in place.
 3. Run the task with `hound run`; use `hound chain` only when crossing applications.
 4. Prefer deterministic adapter actions. Zero driver calls is the ideal fast and cheap path.

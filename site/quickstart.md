@@ -13,6 +13,10 @@ hound adapters add notepad
 hound run notepad "Write a short note" --var text="hello" --tutorial --json
 ```
 
+Read the `drivers` object returned by `hound check`. It reports whether JEV and CLEF are ready and
+provides exact setup instructions. Do not ask a user to paste an API key into chat; have them set it
+in their local environment. Drivers are optional for deterministic steps with one valid action.
+
 To make the preference repository-local as well, run `hound codex install --agents` from the
 repository root. Remove both managed integrations later with `hound codex remove --agents`, then
 remove the executable with `uv tool uninstall hound-agent`. Hound refuses to overwrite or remove

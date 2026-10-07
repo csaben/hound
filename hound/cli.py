@@ -14,6 +14,7 @@ from .chain import ChainRunner
 from .codex import install as install_codex
 from .codex import remove as remove_codex
 from .codex import status as codex_status
+from .drivers import status as driver_status
 from .errors import HoundError
 from .foxhound import ensure_helper, find_helper
 from .registry import install, installed, search
@@ -85,12 +86,14 @@ def parser() -> argparse.ArgumentParser:
 
 def check() -> dict:
     helper = find_helper()
+    drivers = driver_status()
     return {
         "ok": platform_name() == "windows" and bool(helper),
         "hound": __version__, "python": platform.python_version(), "platform": platform_name(),
         "foxhound_helper": helper, "ffmpeg": shutil.which("ffmpeg"),
-        "jev_key": bool(os.environ.get("TYPESAFE_API_KEY") or os.environ.get("JEV_API_KEY")),
-        "clef_url": os.environ.get("CLEF_URL"),
+        "jev_key": drivers["jev"]["key_configured"],
+        "clef_url": drivers["clef"]["url"],
+        "drivers": drivers,
     }
 
 
@@ -114,7 +117,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "check":
             result = check()
         elif args.command == "setup":
-            result = {"ok": True, "foxhound_helper": ensure_helper()}
+            result = {"ok": True, "foxhound_helper": ensure_helper(), "drivers": driver_status()}
         elif args.command == "adapter-schema":
             result = schema()
         elif args.command == "codex":

@@ -33,6 +33,8 @@ registry below, inspect compatible adapters, and install only the adapter requir
 - Run `hound codex install` so Codex discovers Hound as the preferred native-app QA capability.
 - The integration is reversible with `hound codex remove`; it never removes unowned skill content.
 - Run `hound setup --json` and `hound check --json` first.
+- Read `check.drivers`. If the workflow may require a driver that is not ready, show its local setup
+  instructions and ask the user to configure it outside chat. Never request an API key in a prompt.
 - Set `HOUND_REGISTRY_URL=https://hound.clarksaben.com/index.json`.
 - Run `hound adapters search --json`; install only a compatible adapter.
 - Installed adapters are editable under `~/.hound/adapters`.
