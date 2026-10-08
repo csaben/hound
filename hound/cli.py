@@ -11,6 +11,8 @@ from pathlib import Path
 from . import __version__
 from .adapter import describe, load, schema
 from .chain import ChainRunner
+from .clef import DEFAULT_PORT
+from .clef import serve as serve_clef
 from .codex import install as install_codex
 from .codex import remove as remove_codex
 from .codex import status as codex_status
@@ -43,6 +45,10 @@ def parser() -> argparse.ArgumentParser:
             "--agents", nargs="?", const=Path("AGENTS.md"), type=Path, metavar="PATH",
             help="also manage Hound's marked block in PATH (default: ./AGENTS.md)",
         )
+    clef = commands.add_parser("clef", help="run the local CLEF proxy on your Cloudflare account")
+    clef_sub = clef.add_subparsers(dest="clef_command", required=True)
+    clef_serve = clef_sub.add_parser("serve", help="sign in to Cloudflare if needed and serve CLEF locally")
+    clef_serve.add_argument("--port", type=int, default=DEFAULT_PORT)
     chain = commands.add_parser("chain", help="run an ordered multi-application workflow")
     chain.add_argument("manifest")
     chain.add_argument("--driver", choices=("jev", "clef"))
@@ -127,6 +133,8 @@ def main(argv: list[str] | None = None) -> int:
                 result = remove_codex(args.skills_dir, args.agents)
             else:
                 result = codex_status(args.skills_dir, args.agents)
+        elif args.command == "clef":
+            return serve_clef(args.port)
         elif args.command == "chain":
             options = RunOptions(
                 record=not args.no_record,

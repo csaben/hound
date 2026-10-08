@@ -35,6 +35,9 @@ current OS, leaves installed adapters editable, and supports JEV and CLEF System
 - Run `hound check --json` to inspect local capabilities.
 - Read `check.drivers`; when a needed driver is not ready, show its setup commands and have the user
   set secrets locally. Never request or place an API key in chat, an adapter, or repository files.
+- For CLEF, start `hound clef serve` in the background (Node.js 20+ required). The first run opens
+  a browser for the user to sign in to Cloudflare; poll `hound check --json` until
+  `drivers.clef.ready` is true, then pass `--driver clef`. Never deploy the local proxy.
 - Run `hound adapter-schema --json` for the adapter contract.
 - Run `hound chain CHAIN.yaml --tutorial --json` for an ordered multi-application tutorial.
 - Set `HOUND_REGISTRY_URL` or pass `--registry` before remote adapter discovery.

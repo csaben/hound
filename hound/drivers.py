@@ -12,6 +12,7 @@ from typing import Any
 import requests
 from PIL import Image
 
+from .clef import DEFAULT_URL, proxy_running
 from .errors import DriverError
 
 
@@ -20,10 +21,7 @@ def status() -> dict[str, Any]:
     jev_sdk = importlib.util.find_spec("typesafe_sdk") is not None
     clef_url = os.environ.get("CLEF_URL")
     jev_env = '$env:JEV_API_KEY = "<your key>"' if os.name == "nt" else 'export JEV_API_KEY="<your key>"'
-    clef_env = (
-        '$env:CLEF_URL = "http://127.0.0.1:8787/v1/systemone"'
-        if os.name == "nt" else 'export CLEF_URL="http://127.0.0.1:8787/v1/systemone"'
-    )
+    clef_proxy = not clef_url and proxy_running()
     return {
         "jev": {
             "ready": jev_key and jev_sdk,
@@ -38,13 +36,16 @@ def status() -> dict[str, Any]:
             ],
         },
         "clef": {
-            "ready": bool(clef_url),
+            "ready": bool(clef_url) or clef_proxy,
             "url_configured": bool(clef_url),
-            "url": clef_url,
+            "local_proxy_running": clef_proxy,
+            "url": clef_url or (DEFAULT_URL if clef_proxy else None),
             "model": os.environ.get("CLEF_MODEL", "clef"),
             "setup": [
-                clef_env,
-                "Replace the example with your SystemOne-compatible endpoint when needed.",
+                "Install Node.js 20+ if `npx` is missing (Windows: winget install OpenJS.NodeJS.LTS).",
+                "Have the user run `hound clef serve` in a separate terminal and keep it open; "
+                "it opens a browser for Cloudflare sign-in the first time.",
+                "Run Hound with `--driver clef`; `hound check --json` then reports clef ready.",
             ],
         },
         "note": (
@@ -116,7 +117,7 @@ class ClefDriver:
 
     def __init__(self, model: str | None = None, url: str | None = None):
         self.model = model or os.environ.get("CLEF_MODEL", "clef")
-        self.url = url or os.environ.get("CLEF_URL", "http://127.0.0.1:8787/v1/systemone")
+        self.url = url or os.environ.get("CLEF_URL", DEFAULT_URL)
 
     def choose(self, state: dict[str, Any], actions: list[dict[str, Any]], image: bytes | None = None) -> Decision:
         body: dict[str, Any] = {"model": self.model, "state": state, "questions": _question(actions, True)}
@@ -136,7 +137,7 @@ class ClefDriver:
                 detail = response.text[:300].replace("\n", " ")
                 raise DriverError(f"CLEF request failed: HTTP {response.status_code}: {detail}")
         except requests.RequestException as exc:
-            hint = " Set CLEF_URL to a reachable SystemOne endpoint and run `hound check --json`."
+            hint = " Start the local proxy with `hound clef serve`, or set CLEF_URL to a reachable SystemOne endpoint."
             raise DriverError(f"CLEF request failed at {self.url}: {exc}.{hint}") from exc
         raw = response.json()
         if isinstance(raw.get("result"), dict):

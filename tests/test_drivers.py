@@ -29,7 +29,17 @@ def test_driver_status_explains_deterministic_path(monkeypatch):
     monkeypatch.delenv("JEV_API_KEY", raising=False)
     monkeypatch.delenv("TYPESAFE_API_KEY", raising=False)
     monkeypatch.delenv("CLEF_URL", raising=False)
+    monkeypatch.setattr("hound.drivers.proxy_running", lambda: False)
     result = status()
     assert not result["jev"]["ready"]
     assert not result["clef"]["ready"]
     assert "deterministic" in result["note"]
+
+
+def test_running_local_clef_proxy_makes_clef_ready(monkeypatch):
+    monkeypatch.delenv("CLEF_URL", raising=False)
+    monkeypatch.setattr("hound.drivers.proxy_running", lambda: True)
+    clef = status()["clef"]
+    assert clef["ready"] and clef["local_proxy_running"]
+    assert clef["url"] == "http://127.0.0.1:8791/v1/systemone"
+    assert any("hound clef serve" in step for step in clef["setup"])

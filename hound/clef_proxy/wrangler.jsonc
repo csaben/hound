@@ -1,0 +1,8 @@
+{
+  // Local development only: `hound clef serve` runs `wrangler dev` with this file.
+  "name": "hound-clef-local",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-04",
+  "workers_dev": false,
+  "ai": { "binding": "AI", "remote": true }
+}

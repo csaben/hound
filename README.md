@@ -48,7 +48,7 @@ only when two or more actions are valid.
 
 Hound requires Python 3.11 or newer. Add the optional JEV driver with
 `uv tool install --force --with "typesafe-sdk>=0.7.2" "hound-agent @ git+https://github.com/csaben/hound.git"`;
-CLEF uses the core installation.
+CLEF uses the core installation plus Node.js; see [CLEF driver](#clef-driver).
 
 Make Codex discover and prefer Hound for native application QA:
 
@@ -71,9 +71,40 @@ its SHA-256 digest, and caches it under `HOUND_HOME`. The first run also perform
 the helper is missing. Set `FOXHOUND_HELPER` to use a local binary, or set both
 `HOUND_FOXHOUND_URL` and `HOUND_FOXHOUND_SHA256` to use another trusted build.
 
-Set `JEV_API_KEY`/`TYPESAFE_API_KEY` for JEV, or `CLEF_URL` for a SystemOne-compatible CLEF
-endpoint. Set secrets in the local environment, never in a prompt or adapter. `FOXHOUND_HELPER` can
+Set `JEV_API_KEY`/`TYPESAFE_API_KEY` for JEV, or run `hound clef serve` for CLEF. Set secrets in the local environment, never in a prompt or adapter. `FOXHOUND_HELPER` can
 point at a helper binary outside the adjacent Foxhound checkout.
+
+## CLEF driver
+
+CLEF is Cloudflare's Workers AI decision model (`clef` and the cheaper `clef-flash`). Hound reaches
+it through a small proxy that runs on your machine and calls Workers AI on your own Cloudflare
+account. Sign-in happens in the browser; there is no API key to copy.
+
+```powershell
+winget install OpenJS.NodeJS.LTS   # only if `npx` is missing; Node.js 20+ is required
+hound clef serve                   # first run opens a browser for Cloudflare sign-in; keep it open
+```
+
+In another terminal:
+
+```powershell
+hound check --json                 # drivers.clef.ready and local_proxy_running are true
+hound run notepad "Write a short note" --var text="hello" --driver clef --json
+```
+
+- `hound clef serve` copies the proxy into `~/.hound/clef-proxy` and runs a pinned Wrangler
+  `wrangler dev` on `127.0.0.1:8791`. Wrangler keeps the OAuth sign-in; Hound never sees a token.
+  Rerunning it while the proxy is up is a no-op.
+- The proxy only listens on loopback, rejects non-local hosts, and forwards only `clef` and
+  `clef-flash`. Do not `wrangler deploy` it: it has no authentication of its own.
+- Workers AI usage is billed to the signed-in Cloudflare account. Set `CLEF_MODEL=clef-flash` for
+  the cheaper model.
+- Pass `--driver clef`, or set `driver.default: clef` in an adapter, because JEV is the default.
+- With `--port N`, also set `CLEF_URL=http://127.0.0.1:N/v1/systemone`. `CLEF_URL` can point at any
+  other SystemOne-compatible endpoint instead.
+
+Agents: `hound clef serve` is long-running. Start it as a background process (or ask the user to run
+it in their own terminal), let the user finish the browser sign-in, and poll `hound check --json`.
 
 ## Agent happy path
 

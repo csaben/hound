@@ -42,4 +42,16 @@ to cover the user's foreground application.
 
 Set `JEV_API_KEY` or `TYPESAFE_API_KEY` after adding the JEV optional dependency with
 `uv tool install --force --with "typesafe-sdk>=0.7.2" "hound-agent @ git+https://github.com/csaben/hound.git"`.
-Set `CLEF_URL` to use a compatible CLEF endpoint.
+For CLEF, Cloudflare's Workers AI decision model, install Node.js 20+ if `npx` is missing, then run
+the local proxy in its own terminal and keep it open. The first run opens a browser to sign in to
+Cloudflare; usage is billed to that account and no API key is copied anywhere.
+
+```powershell
+winget install OpenJS.NodeJS.LTS   # only if npx is missing
+hound clef serve                   # long-running; serves http://127.0.0.1:8791/v1/systemone
+```
+
+Then, in another terminal, `hound check --json` reports `drivers.clef.ready: true` and runs can use
+`--driver clef`. An agent should start `hound clef serve` in the background, let the user finish the
+browser sign-in, and poll `hound check --json`. Never deploy the proxy; it has no authentication.
+Set `CLEF_MODEL=clef-flash` for the cheaper model, or `CLEF_URL` for another compatible endpoint.

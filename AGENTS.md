@@ -7,7 +7,8 @@ behavior is specific to one application.
 
 1. Run `hound setup --json`, then `hound check --json`.
    Read `check.drivers`; if a potentially needed driver is not ready, show its setup commands and
-   ask the user to configure the secret locally. Never ask for an API key in chat.
+   ask the user to configure the secret locally. Never ask for an API key in chat. For CLEF, start
+   `hound clef serve` in the background; the user signs in to Cloudflare in the browser.
 2. Inspect `hound adapter-schema --json`.
 3. Search a configured registry with `hound adapters search --json`.
 4. Install only the adapter needed for the current OS and task.
